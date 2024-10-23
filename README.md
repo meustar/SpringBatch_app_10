@@ -4,6 +4,7 @@
 스프링 시큐리티.
 인증 / 인가
 @Valid 무효성 검사?
+csrf 토큰
 
 ---
 
@@ -15,3 +16,9 @@
 
 #### 38강 layout, sec 해결법
 - settings > Inspection 검색 > namespace 검색 > XML Unbound namespace prefix 체크해제.
+
+## 4교시
+- 39강. 코드 설명 및 주석.
+
+## 5교시
+- 40강 음원 관련 파일 업로드, 테스트 

@@ -17,36 +17,41 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+
 @SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
+@AutoConfigureMockMvc   //  MockMVC 설정 / MockMVC == 실제 웹서버를 띄우지 않아도 HTTP요청을 흉내내서 컨트롤서 메서드를 실행.
+@Transactional  // 테스트 메서드가 끝나면 다시 롤백.
 @ActiveProfiles("test")
 public class MemberControllerTests {
+
     @Autowired
     private MockMvc mvc;
+
     @Autowired
     private MemberService memberService;
+
     @Test
     @DisplayName("회원가입 폼")
     void t1() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
-                .perform(get("/member/join"))
+                .perform(get("/member/join"))   // member/join GET 요청 -> 폼 내놔.
                 .andDo(print());
         // THEN
         resultActions
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(handler().handlerType(MemberController.class))
-                .andExpect(handler().methodName("showJoin"))
-                .andExpect(content().string(containsString("회원가입")));
+                .andExpect(status().is2xxSuccessful())  // 서버측 응답이 200번대의 성공인지.
+                .andExpect(handler().handlerType(MemberController.class))   // 요청을 MemberController가 처리 했는지?
+                .andExpect(handler().methodName("showJoin"))    // 실행된 method가 showJoin인지?
+                .andExpect(content().string(containsString("회원가입")));   // 해당 페이지에 "회원가입"텍스트가 있는지?
     }
     @Test
     @DisplayName("회원가입")
     void t2() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
-                .perform(post("/member/join")
-                        .with(csrf())
+                .perform(post("/member/join")   // member/join POST 요청 ->
+                        .with(csrf())   // csrf 토큰을 추가해서 보안 검증 통과
                         .param("username", "user999")
                         .param("password", "1234")
                         .param("email", "user999@test.com")
@@ -54,10 +59,10 @@ public class MemberControllerTests {
                 .andDo(print());
         // THEN
         resultActions
-                .andExpect(status().is3xxRedirection())
+                .andExpect(status().is3xxRedirection()) //  리다이렉션(300번대)이 되었는지?
                 .andExpect(handler().handlerType(MemberController.class))
                 .andExpect(handler().methodName("join"))
-                .andExpect(redirectedUrlPattern("/member/login?msg=**"));
-        assertThat(memberService.findByUsername("user999").isPresent()).isTrue();
+                .andExpect(redirectedUrlPattern("/member/login?msg=**"));   // 리다이랙트 URL 패턴이 /member/login?msg=** 이러한 형식인지 확인.
+        assertThat(memberService.findByUsername("user999").isPresent()).isTrue();   // user999가 memberservice에 저장이 잘 되었는지.?
     }
 }

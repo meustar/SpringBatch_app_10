@@ -16,14 +16,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+
+// 전반적인 내용. 로그인을 성공 했을 때, 그 후처리들.
+
 @Component
-public class CustomAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class CustomAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {   // 인증 성공시(로그인 성공)의 동작을 컨트롤.
+
     private final RequestCache requestCache = new HttpSessionRequestCache();
-    private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+    // 사용자가 인증 X 상태에서 접근하려고 했던 요청 기억. -> 인증 O -> 리다이렉트 를 저장하려는 캐쉬 데이터.
+    private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy(); 
+    // 인증 O -> 다른 URL로 보냄.
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
-        clearSession(request);
+                                        Authentication authentication) throws IOException { // 인증 성공시 호출되는 메서드
+        clearSession(request);  // 로그인 실패시에 남아있는 에러 정보를 세션에서 제거
         SavedRequest savedRequest = requestCache.getRequest(request, response);
         /**
          * prevPage가 존재하는 경우 = 사용자가 직접 /auth/login 경로로 로그인 요청
@@ -32,29 +39,32 @@ public class CustomAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         String prevPage = (String) request.getSession().getAttribute("prevPage");
         if (prevPage != null) {
             request.getSession().removeAttribute("prevPage");
-        }
+        }   // 사용자가 로그인 하기 전의 페이지 => prevPage로 세션에 저장되어 있는 경우 - 확인하고 삭제.
+
+
         // 기본 URI
         String url = "/";
         /**
          * savedRequest 존재하는 경우 = 인증 권한이 없는 페이지 접근
          * Security Filter가 인터셉트하여 savedRequest에 세션 저장
          */
-        if (savedRequest != null) {
+        if (savedRequest != null) { // 사용자가 만약에 보호된 페이지에 접근시에 사용자가 보냈던 요청이 savedRequest에 저장.
             url = savedRequest.getRedirectUrl();
         } else if (prevPage != null && prevPage.length() > 0) {
             // 회원가입 -> 로그인으로 넘어온 경우 "/"로 redirect
             if (prevPage.contains("/member/join")) {
-                url = "/";
+                url = "/";  // 회원가입 후 바로 로그인 하면 /(home)으로 리다이렉트
             } else {
-                url = prevPage;
+                url = prevPage; // 다른 페이지에서 로그인 하면 직전 페이지로 리다이렉트
             }
         }
         MemberContext memberContext = (MemberContext) authentication.getPrincipal();
         url = Ut.url.modifyQueryParam(url, "msg", memberContext.getName() + "님 환영합니다.");
-        redirectStrategy.sendRedirect(request, response, url);
+        redirectStrategy.sendRedirect(request, response, url);  // 로그인 성공 후 리다이렉트로 보낼때 같이 보낼 환영인사 메세지.
     }
     // 로그인 실패 후 성공 시 남아있는 에러 세션 제거
-    protected void clearSession(HttpServletRequest request) {
+    // 쌓여있을 실패 상태가 성공 이후에 영향을 주지 않도록. 쌓이지 않게 제거.
+    protected void clearSession(HttpServletRequest request) { 
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);

@@ -11,15 +11,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+
+
 @Service
-@RequiredArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService {
-    private final MemberRepository memberRepository;
+@RequiredArgsConstructor    // final에 대한 생성자를 자동으로 생성.
+public class CustomUserDetailsService implements UserDetailsService {   // 사용자 인증 정보 조회. 출처는 DB
+
+    // 데이터의 출처는 DB -> Spring Security에서 사용가능하게 변환.
+    private final MemberRepository memberRepository;    // 객체 상태가 변하지 않는 "불변성"을 가진다.
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Member member = memberRepository.findByUsername(username).get();
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("MEMBER"));
+        List<GrantedAuthority> authorities = new ArrayList<>(); // GrantedAuthority 권한 부여
+        authorities.add(new SimpleGrantedAuthority("MEMBER"));  // MEMBER 권한을 부여 - 권한 객체는 SimpleGrantedAuthority
         return new MemberContext(member, authorities);
     }
 }

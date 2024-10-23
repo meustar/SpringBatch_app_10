@@ -12,6 +12,7 @@ public class MemberContext extends User {
     private final LocalDateTime modifyDate;
     private final String username;
     private final String email;
+
     public MemberContext(Member member, List<GrantedAuthority> authorities) {
         super(member.getUsername(), member.getPassword(), authorities);
         this.id = member.getId();

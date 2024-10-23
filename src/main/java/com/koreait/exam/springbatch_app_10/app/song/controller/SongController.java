@@ -34,6 +34,7 @@ public class SongController {
         return "song/create";
     }
 
+    // 생성 처리.
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
     public String create(@AuthenticationPrincipal MemberContext memberContext, @Valid SongForm songForm) {

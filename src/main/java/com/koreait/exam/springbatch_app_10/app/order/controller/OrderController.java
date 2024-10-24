@@ -8,6 +8,7 @@ import com.koreait.exam.springbatch_app_10.app.order.exception.ActorCanNotSeeOrd
 import com.koreait.exam.springbatch_app_10.app.order.exception.OrderIdNotMatchedException;
 import com.koreait.exam.springbatch_app_10.app.order.service.OrderService;
 import com.koreait.exam.springbatch_app_10.app.security.dto.MemberContext;
+import com.koreait.exam.springbatch_app_10.util.Ut;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpResponse;
@@ -51,8 +52,8 @@ public class OrderController {
         model.addAttribute("order", order);
         return "order/detail";
     }
-    private final String SECRET_KEY = "payments 개발자센터, 내 개발 정보 , API 개별 연동 키, 시크릿 키";
-//    private final String SECRET_KEY = "test_sk_6BYq7GWPVve7a2BqBwAG3NE5vbo1";
+//    private final String SECRET_KEY = "payments 개발자센터, 내 개발 정보 , API 개별 연동 키, 시크릿 키";
+    private final String SECRET_KEY = "test_sk_6BYq7GWPVve7a2BqBwAG3NE5vbo1";
 
     @PostConstruct
     private void init() {
@@ -82,6 +83,7 @@ public class OrderController {
         }
 
         HttpHeaders headers = new HttpHeaders();
+
         // headers.setBasicAuth(SECRET_KEY, ""); // spring framework 5.2 이상 버전에서 지원
         headers.set("Authorization", "Basic " + Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes()));
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -91,11 +93,13 @@ public class OrderController {
         HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(payloadMap), headers);
         ResponseEntity<JsonNode> responseEntity = restTemplate.postForEntity(
                 "https://api.tosspayments.com/v1/payments/" + paymentKey, request, JsonNode.class);
+
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
-            JsonNode successNode = responseEntity.getBody();
-            model.addAttribute("orderId", successNode.get("orderId").asText());
-            String secret = successNode.get("secret").asText(); // 가상계좌의 경우 입금 callback 검증을 위해서 secret을 저장하기를 권장함
-            return "order/success";
+//            JsonNode successNode = responseEntity.getBody();
+//            model.addAttribute("orderId", successNode.get("orderId").asText());
+//            String secret = successNode.get("secret").asText(); // 가상계좌의 경우 입금 callback 검증을 위해서 secret을 저장하기를 권장함
+            orderService.payByTossPayments(order);
+            return "redirect:/order/%d?msg=%s".formatted(order.getId(), Ut.url.encode("결제가 완료되었습니다"));
         } else {
             JsonNode failNode = responseEntity.getBody();
             model.addAttribute("message", failNode.get("message").asText());

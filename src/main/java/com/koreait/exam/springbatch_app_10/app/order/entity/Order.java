@@ -1,8 +1,10 @@
 package com.koreait.exam.springbatch_app_10.app.order.entity;
+
 import com.koreait.exam.springbatch_app_10.app.base.entity.BaseEntity;
 import com.koreait.exam.springbatch_app_10.app.member.entity.Member;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -25,6 +27,11 @@ public class Order extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     private Member buyer;
 
+    private String name;
+    private boolean isPaid;
+    private boolean isCanceled;
+    private boolean isRefunded;
+
     @Builder.Default
     @OneToMany(mappedBy = "order", cascade = ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
@@ -36,7 +43,7 @@ public class Order extends BaseEntity {
     public int calculatePayPrice() {
         int payPrice = 0;
         for (OrderItem orderItem : orderItems) {
-            payPrice += orderItem.getPayPrice();
+            payPrice += orderItem.getSalePrice();
         }
         return payPrice;
     }
@@ -45,12 +52,14 @@ public class Order extends BaseEntity {
         for (OrderItem orderItem : orderItems) {
             orderItem.setPaymentDone();
         }
+        isPaid = true;
     }
 
     public void setRefundDone() {
         for (OrderItem orderItem : orderItems) {
             orderItem.setRefundDone();
         }
+        isRefunded = true;
     }
 
     public int getPayPrice() {
@@ -61,13 +70,13 @@ public class Order extends BaseEntity {
         return payPrice;
     }
 
-    public String getName() {
+    public void makeName() {
         String name = orderItems.get(0).getProduct().getTitle();
 
         if (orderItems.size() > 1) {
             name += "외 %d곡".formatted(orderItems.size()-1);
         }
 
-        return name;
+        this.name = name;
     }
 }

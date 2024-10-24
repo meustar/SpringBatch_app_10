@@ -72,6 +72,8 @@ B
 ## 4교시
 
 - 44강 주문, 환불 기능 구현.
-- 주문 상세보기 
+- 45강 주문 상세 페이지 구현
 
 ## 5교시
+- 46강 토스페이먼츠 프론트 연동
+- https://developers.tosspayments.com/1038872/accounts/1327242/phases/test/api-keys

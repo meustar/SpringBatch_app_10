@@ -5,7 +5,6 @@
 인증 / 인가
 @Valid 무효성 검사?
 csrf 토큰
-
 ---
 
 ## 2교시
@@ -47,3 +46,21 @@ B
   - 정산.
 
 이전에 했던 쇼핑몰 내용들 총 동원해서 사용할 계획.
+
+---
+
+# 2024-10-24
+---
+#### 키워드
+
+
+---
+
+##  2교시
+- 42강 
+  - 참고1 [내가 @NoArgsConstructor (access = AccessLevel.PROTECTED)를 작성했던 이유](https://velog.io/@kevin_/%EB%82%B4%EA%B0%80-NoargsConstructor-access-AccessLevel.PROTECTED%EB%A5%BC-%EC%99%9C-%EC%9E%91%EC%84%B1%ED%96%88%EC%9D%84%EA%B9%8C)
+  - 참고 2 [[Spring] @Transactional의 이해](https://imiyoungman.tistory.com/9)
+
+
+시나리오.
+회원, 음원 -> 상품 -> 장바구니 -> Cash -> 주문

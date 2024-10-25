@@ -77,3 +77,9 @@ B
 ## 5교시
 - 46강 토스페이먼츠 프론트 연동
 - https://developers.tosspayments.com/1038872/accounts/1327242/phases/test/api-keys
+- 47강 토스페이먼츠 백엔드 연동
+
+## 6교시
+- 48강 백엔드에서 결제 데이터 무결성 체크
+- 49강 무결성 체크 후 문제 없다면 결제 완료 처리
+- [타임리프 문법 정리](https://makeaplayground.tistory.com/187)
